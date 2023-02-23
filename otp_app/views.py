@@ -1,6 +1,6 @@
 from rest_framework import status, generics
 
-from .serializers import UserRegisterSerializer, UserViewSerializer
+from .serializers import UserRegisterSerializer, UserViewSerializer, UserOtpSerializer
 
 from rest_framework.response import Response
 from django.contrib.auth import get_user_model
@@ -60,3 +60,21 @@ class GenerateOtpSeretView(generics.GenericAPIView):
         user.otp_auth_url = otp_auth_url
         user.save()
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class VerifyOtpView(generics.GenericAPIView):
+    serializer_class = UserOtpSerializer
+    permission_classes = [IsAuthenticated]
+    http_method_names = ['post','options','head']
+
+    def post(self, request, *args, **kwargs):
+        user = request.user
+        serializer = self.serializer_class(instance=user, data=request.data)
+        serializer.context['user'] = user
+        serializer.is_valid(raise_exception=True)
+        user.otp_enabled = True
+        user.otp_verified = True
+        user.save()
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+    

@@ -2,6 +2,8 @@ from rest_framework import serializers
 
 from django.contrib.auth import get_user_model
 
+import pyotp
+
 User = get_user_model()
 
 
@@ -43,3 +45,24 @@ class UserViewSerializer(serializers.ModelSerializer):
             'otp_base32': {'read_only': True},
             'otp_auth_url': {'read_only': True},
         }
+
+
+class UserOtpSerializer(serializers.ModelSerializer):
+    otp_token = serializers.CharField(max_length=100, write_only=True)
+    class Meta:
+        model = User
+        fields = ['id','username','otp_token','otp_enabled','otp_verified']
+        extra_kwargs = {
+            'username': {'read_only': True},
+            'otp_enabled': {'read_only': True},
+            'otp_verified': {'read_only': True},
+        }
+    
+    def validate(self, attrs):
+        otp_token = attrs['otp_token']
+        user = self.context['user']
+        totp = pyotp.TOTP(user.otp_base32)
+        if not totp.verify(otp_token):
+            raise serializers.ValidationError({"error":"invalid otp token"})
+        return user
+        
