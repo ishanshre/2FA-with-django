@@ -29,4 +29,17 @@ class UserRegisterSerializer(serializers.ModelSerializer):
         user.set_password(validated_data["password"])
         user.save()
         return user
-        
+    
+
+class UserViewSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id','username','email','otp_enabled','otp_verified','otp_base32','otp_auth_url']
+        extra_kwargs = {
+            'username': {'read_only': True},
+            'email': {'read_only': True},
+            'otp_enabled': {'read_only': True},
+            'otp_verified': {'read_only': True},
+            'otp_base32': {'read_only': True},
+            'otp_auth_url': {'read_only': True},
+        }

@@ -10,6 +10,7 @@ markdown = "*"
 django-filter = "*"
 python-dotenv = "*"
 djangorestframework-simplejwt = "*"
+pyotp = "*"
 
 [dev-packages]
 
