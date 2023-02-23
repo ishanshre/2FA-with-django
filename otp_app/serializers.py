@@ -60,9 +60,9 @@ class UserOtpSerializer(serializers.ModelSerializer):
     
     def validate(self, attrs):
         otp_token = attrs['otp_token']
-        user = self.context['user']
-        totp = pyotp.TOTP(user.otp_base32)
+        otp_base32 = self.context['otp_base32']
+        totp = pyotp.TOTP(otp_base32)
         if not totp.verify(otp_token):
             raise serializers.ValidationError({"error":"invalid otp token"})
-        return user
+        return attrs
         

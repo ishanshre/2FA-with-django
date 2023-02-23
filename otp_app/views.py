@@ -70,7 +70,7 @@ class VerifyOtpView(generics.GenericAPIView):
     def post(self, request, *args, **kwargs):
         user = request.user
         serializer = self.serializer_class(instance=user, data=request.data)
-        serializer.context['user'] = user
+        serializer.context['otp_base32'] = user.otp_base32
         serializer.is_valid(raise_exception=True)
         user.otp_enabled = True
         user.otp_verified = True
